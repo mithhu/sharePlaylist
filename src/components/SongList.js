@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   CircularProgress,
   Card,
@@ -9,16 +9,20 @@ import {
   IconButton,
   makeStyles,
 } from "@material-ui/core";
-import { PlayArrow, Save } from "@material-ui/icons";
+import { PlayArrow, Save, Pause } from "@material-ui/icons";
+import { useMutation, useSubscription } from "@apollo/react-hooks";
+import { GET_SONGS } from "../graphql/subscriptions";
+import { SongContext } from "../App";
+import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutations";
 
 function SongList() {
-  let loading = false;
+  const { data, loading, error } = useSubscription(GET_SONGS);
 
-  const song = {
-    title: "LÜNE",
-    artist: "MÖÖN",
-    thumbnail: "http://img.youtube.com/vi/--ZtUFsIgMk/0.jpg",
-  };
+  // const song = {
+  //   title: "LÜNE",
+  //   artist: "MÖÖN",
+  //   thumbnail: "http://img.youtube.com/vi/--ZtUFsIgMk/0.jpg"
+  // };
 
   if (loading) {
     return (
@@ -34,11 +38,12 @@ function SongList() {
       </div>
     );
   }
+  if (error) return <div>Error fetching songs</div>;
 
   return (
     <div>
-      {Array.from({ length: 10 }, () => song).map((song, i) => (
-        <Song key={i} song={song} />
+      {data.songs.map((song) => (
+        <Song key={song.id} song={song} />
       ))}
     </div>
   );
@@ -65,8 +70,32 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Song({ song }) {
+  const { id } = song;
   const classes = useStyles();
+  const [addOrRemoveFromQueue] = useMutation(ADD_OR_REMOVE_FROM_QUEUE, {
+    onCompleted: (data) => {
+      localStorage.setItem("queue", JSON.stringify(data.addOrRemoveFromQueue));
+    },
+  });
+  const { state, dispatch } = useContext(SongContext);
+  const [currentSongPlaying, setCurrentSongPlaying] = useState(false);
   const { title, artist, thumbnail } = song;
+
+  useEffect(() => {
+    const isSongPlaying = state.isPlaying && id === state.song.id;
+    setCurrentSongPlaying(isSongPlaying);
+  }, [id, state.song.id, state.isPlaying]);
+
+  function handleTogglePlay() {
+    dispatch({ type: "SET_SONG", payload: { song } });
+    dispatch(state.isPlaying ? { type: "PAUSE_SONG" } : { type: "PLAY_SONG" });
+  }
+
+  function handleAddOrRemoveFromQueue() {
+    addOrRemoveFromQueue({
+      variables: { input: { ...song, __typename: "Song" } },
+    });
+  }
 
   return (
     <Card className={classes.container}>
@@ -82,10 +111,14 @@ function Song({ song }) {
             </Typography>
           </CardContent>
           <CardActions>
-            <IconButton size="small" color="primary">
-              <PlayArrow />
+            <IconButton onClick={handleTogglePlay} size="small" color="primary">
+              {currentSongPlaying ? <Pause /> : <PlayArrow />}
             </IconButton>
-            <IconButton size="small" color="secondary">
+            <IconButton
+              onClick={handleAddOrRemoveFromQueue}
+              size="small"
+              color="secondary"
+            >
               <Save />
             </IconButton>
           </CardActions>
