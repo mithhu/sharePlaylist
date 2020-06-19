@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   TextField,
   InputAdornment,
@@ -42,13 +42,13 @@ const DEFAULT_SONG = {
 
 function AddSong() {
   const classes = useStyles();
-  const [addSong, { error }] = useMutation(ADD_SONG);
+  const [addSong] = useMutation(ADD_SONG);
   const [url, setUrl] = useState("");
   const [playable, setPlayable] = useState(false);
   const [dialog, setDialog] = useState(false);
   const [song, setSong] = useState(DEFAULT_SONG);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const isPlayable = ReactPlayer.canPlay(url);
     setPlayable(isPlayable);
   }, [url]);
@@ -85,7 +85,7 @@ function AddSong() {
           thumbnail: thumbnail.length > 0 ? thumbnail : null,
           duration: duration > 0 ? duration : null,
           title: title.length > 0 ? title : null,
-          artist: artist.length > 0 ? artist : null,
+          artist: artist,
         },
       });
       handleCloseDialog();
@@ -98,6 +98,7 @@ function AddSong() {
 
   function getYoutubeInfo(player) {
     const duration = player.getDuration();
+    console.log("player", player);
     const { title, video_id, author } = player.getVideoData();
     const thumbnail = `http://img.youtube.com/vi/${video_id}/0.jpg`;
     return {
@@ -123,10 +124,6 @@ function AddSong() {
     });
   }
 
-  function handleError(field) {
-    return error?.graphQLErrors[0]?.extensions?.path.includes(field);
-  }
-
   const { thumbnail, title, artist } = song;
   return (
     <div className={classes.container}>
@@ -149,8 +146,6 @@ function AddSong() {
             name="title"
             label="Title"
             fullWidth
-            error={handleError("title")}
-            helperText={handleError("title") && "Fill out field"}
           />
           <TextField
             value={artist}
@@ -159,8 +154,6 @@ function AddSong() {
             name="artist"
             label="Artist"
             fullWidth
-            error={handleError("artist")}
-            helperText={handleError("artist") && "Fill out field"}
           />
           <TextField
             value={thumbnail}
@@ -169,8 +162,6 @@ function AddSong() {
             name="thumbnail"
             label="Thumbnail"
             fullWidth
-            error={handleError("thumbnail")}
-            helperText={handleError("thumbnail") && "Fill out field"}
           />
         </DialogContent>
         <DialogActions>

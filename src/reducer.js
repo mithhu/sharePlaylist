@@ -16,6 +16,7 @@ function songReducer(state, action) {
       return {
         ...state,
         song: action.payload.song,
+        isPlaying: true,
       };
     }
     default:

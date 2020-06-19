@@ -13,12 +13,6 @@ import { ADD_OR_REMOVE_FROM_QUEUE } from "../graphql/mutations";
 function QueuedSongList({ queue }) {
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
 
-  // const song = {
-  //   title: "LÜNE",
-  //   artist: "MÖÖN",
-  //   thumbnail: "http://img.youtube.com/vi/--ZtUFsIgMk/0.jpg"
-  // };
-
   return (
     greaterThanMd && (
       <div style={{ margin: "10px 0" }}>

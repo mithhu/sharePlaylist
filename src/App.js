@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createContext, useContext, useReducer } from "react";
 import Header from "./components/Header";
 import AddSong from "./components/AddSong";
 import SongList from "./components/SongList";
@@ -6,21 +6,21 @@ import SongPlayer from "./components/SongPlayer";
 import { Grid, useMediaQuery, Hidden } from "@material-ui/core";
 import songReducer from "./reducer";
 
-export const SongContext = React.createContext({
+export const SongContext = createContext({
   song: {
-    id: "bef8a1ca-6db1-4f44-b47c-8da14c12b508",
-    title: "A Way Home",
-    artist: "Memorex Memories",
-    thumbnail: "http://img.youtube.com/vi/KbC46oJmLh4/0.jpg",
-    url: "https://www.youtube.com/watch?v=KbC46oJmLh4",
-    duration: 239,
+    id: "6ba26b36-dbff-4460-8357-87f68e775cd5",
+    title: "Why Programming Is Important",
+    artist: "Programming",
+    thumbnail: "http://img.youtube.com/vi/Dv7gLpW91DM/0.jpg",
+    url: "https://www.youtube.com/watch?v=Dv7gLpW91DM",
+    duration: 344,
   },
   isPlaying: false,
 });
 
 function App() {
-  const initialSongState = React.useContext(SongContext);
-  const [state, dispatch] = React.useReducer(songReducer, initialSongState);
+  const initialSongState = useContext(SongContext);
+  const [state, dispatch] = useReducer(songReducer, initialSongState);
   const greaterThanSm = useMediaQuery((theme) => theme.breakpoints.up("sm"));
   const greaterThanMd = useMediaQuery((theme) => theme.breakpoints.up("md"));
 
@@ -29,7 +29,7 @@ function App() {
       <Hidden only="xs">
         <Header />
       </Hidden>
-      <Grid container spacing={3}>
+      <Grid container>
         <Grid
           style={{
             paddingTop: greaterThanSm ? 80 : 10,
