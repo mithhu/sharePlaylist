@@ -9,7 +9,7 @@ import {
   IconButton,
   makeStyles,
 } from "@material-ui/core";
-import { PlayArrow, Pause, MusicNote } from "@material-ui/icons";
+import { MusicNote } from "@material-ui/icons";
 import QueueIcon from "@material-ui/icons/Queue";
 import { useMutation, useSubscription } from "@apollo/react-hooks";
 import { GET_SONGS } from "../graphql/subscriptions";
